@@ -1,0 +1,35 @@
+version: '3'
+services:
+  mysql_master:
+    image: mysql:8.0
+    env_file:
+      - ./mysql_data/master/mysql_master.env
+    container_name: "mysql_master"
+    restart: "always"
+    ports:
+      - 4406:3306
+    volumes:
+      - ./mysql_data/master/conf/my.cnf:/etc/mysql/my.cnf
+      - ./mysql_data/master/data:/var/lib/mysql
+    networks:
+      - database
+
+  mysql_slave1:
+    image: mysql:8.0
+    env_file:
+      - ./mysql_data/slave1/mysql_slave1.env
+    container_name: "mysql_slave1"
+    restart: "always"
+    ports:
+      - 5506:3306
+    depends_on:
+      - mysql_master
+    volumes:
+      - ./mysql_data/slave1/conf/my.cnf:/etc/mysql/my.cnf
+      - ./mysql_data/slave1/data:/var/lib/mysql
+    networks:
+      - database
+
+networks:
+  database:
+    driver: bridge
